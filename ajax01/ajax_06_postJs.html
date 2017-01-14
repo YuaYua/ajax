@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+	</head>
+	<body>
+	</body>
+	<script type="text/javascript">
+		//一、创建ajax请求对象
+		var ajax=false;
+		if(window.XMLHttpRequest){
+			ajax=new XMLHttpRequest();
+		}else{
+			ajax=new ActiveXObject("Microsoft.XMLHTTP");
+		}
+		//二、创建一个请求
+		ajax.open("post","ajax_07_postserver.php");
+		//三、发送请求
+		ajax.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+		ajax.send("name=lck&password=123");
+		//四、绑定我们状态改变的方法
+		ajax.onreadystatechange=function(){
+//			console.log("haha");
+			//五、判断请求状态
+			if(ajax.readyState==4){
+				//六、
+				if(ajax.status==200){
+					succ(ajax.responseText);
+				}
+			}
+		}
+		
+		function datas(data){
+			console.log("hoho");
+			var obj=JSON.parse(data);
+			console.log(obj);
+		}
+		
+		function succ(data){
+			console.log("cheng");
+			console.log(data);
+		}
+	</script>
+</html>

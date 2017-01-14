@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+	</head>
+	<body>
+	</body>
+	<script type="text/javascript">
+		
+		function path(data,type,url){
+			var arr=[];
+			for(var keys in data){
+				var str=keys+"="+data[keys];
+				arr.push(str);
+//				console.log(str);
+			}
+			
+			var datas = arr.join("&");
+			if (type=="get") {
+				var urls=url+"?"+datas;
+				return urls;
+			}else if (type=="post") {
+				return datas;
+			}
+			
+		}
+		//测试
+//		var result = path({
+//			name:"lck",
+//			pass:123
+//		},"post","index.php");
+//		console.log(result);
+		ajax({
+			url:"http://127.0.0.1/shh/ajax/jsonp_01/jsonp_08_jsjsonp.php",
+			dataType:"jsonp"	,
+			data:{
+				user:"lck"
+			},
+			jsonp:"ccc",
+			success:function(data){
+				console.log("成功");
+				console.log(data);
+			}
+		});
+		function ajax(obj){
+			if(obj.dataType=="jsonp"){
+				var names="jQuery";
+				var num=String(Math.random());
+				num=num.substring(2);
+				names+=num;
+				var newDate=new Date();
+				var times=newDate.getTime();
+				names=names+"_"+times;
+				window[names]=obj.success;
+				var os=document.createElement("script");
+				var url=path(obj.data,"get",obj.url)+"&"+obj.jsonp+"="+names;
+				os.src=url;
+				var oh=document.getElementsByTagName("head")[0];
+				oh.appendChild(os);
+				oh.removeChild(os);
+				return;
+			}
+			
+			
+			
+			//一、创建ajax请求对象
+			var ajax=false;
+			if(window.XMLHttpRequest){
+				ajax=new XMLHttpRequest();
+			}else{
+				ajax=new ActiveXObject("Microsoft.XMLHTTP");
+			}
+			if(obj.type=="get"){
+				var url=path(obj.data,obj.type,obj.url);
+				ajax.open("get",url);
+				ajax.send();
+			}else if(obj.type=="post"){
+				var data=path(obj.data,obj.type,obj.url);
+				ajax.open("post",obj.url);
+				ajax.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+				ajax.send(data);
+			}
+			ajax.onreadystatechange=function(){
+	//			console.log("haha");
+				//五、判断请求状态
+				if(ajax.readyState==4){
+					//六、
+					if(ajax.status==200){
+						obj.success(ajax.responseText);
+					}else{
+						obj.error();
+					}
+				}
+			}
+		}
+	</script>
+</html>

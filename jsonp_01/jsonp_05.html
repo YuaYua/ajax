@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+	</head>
+	<body>
+		<input type="text" name="inp" id="inp" value="" />
+		<ul id="uls"></ul>
+	</body>
+	<script src="js/JQuery-3.1.1.min.js" type="text/javascript" charset="utf-8"></script>
+	<script type="text/javascript">
+		var inp=document.getElementById('inp');
+//		inp.oninput=function(){
+//			var url="http://127.0.0.1/shh/ajax/jsonp_01/jsonp_06_jsserver.php?wd="+this.value+"&cb=success";
+//			var os=document.createElement("script");
+//			os.src=url;
+//			var oh=document.getElementsByTagName("head")[0];
+//			oh.appendChild(os);
+//			oh.removeChild(os);
+//		}
+		inp.oninput=function(){
+			$.ajax({
+				type:"get",
+				url:"http://127.0.0.1/shh/ajax/jsonp_01/jsonp_06_jsserver.php",
+				data:{
+					wd:this.value	
+				},
+				dataType:"jsonp",
+				jsonp:"cb",
+				success:success,
+				error:function(errors){
+					console.log("失败");
+					console.log("errors")
+				},
+				async:true
+			});
+		}
+	
+//		var os=document.createElement("script");
+//		os.src="http://127.0.0.1/shh/ajax/jsonp_01/jsonp_06_jsserver.php?cb=success";
+//		var oh=document.getElementsByTagName("head")[0];
+//		oh.appendChild(os);
+//		oh.removeChild(os);
+		var uls=document.getElementById("uls");
+		function success(data){
+			console.log("成功");
+			console.log(data);
+			uls.innerHTML="";
+			for(var i=0;i<data.length;i++){
+				var lis=document.createElement("li");
+				lis.innerHTML=data[i];
+				uls.appendChild(lis);
+			}
+		}
+	</script>
+</html>

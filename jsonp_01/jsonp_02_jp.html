@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+	</head>
+	<body>
+		<input type="text" name="" id="wd" value="" />
+		<ul id="uls">
+			
+		</ul>
+	</body>
+	<script src="js/JQuery-3.1.1.min.js" type="text/javascript" charset="utf-8"></script>
+	<script type="text/javascript">
+		var wd=document.getElementById("wd");
+		wd.oninput=function(){
+			console.log(this.value);
+			$.ajax({
+				type:"get",
+				url:"https://sp0.baidu.com/5a1Fazu8AA54nxGko9WTAnF6hhy/su",
+				data:{
+					wd:this.value,
+				},
+				dataType:"jsonp",
+				jsonp:"cb",
+				success:success,
+				error:function(errors){
+					console.log("失败");
+					console.log("errors")
+			
+				},
+				async:true
+			});
+		}
+		
+		var uls=document.getElementById("uls");
+		function success(data){
+			console.log(data);
+			uls.innerHTML="";
+			for(var i=0;i<data.s.length;i++){
+				var lis=document.createElement("li");
+				lis.innerHTML=data.s[i];
+				uls.appendChild(lis);
+			}
+			
+		}
+	</script>
+</html>
+

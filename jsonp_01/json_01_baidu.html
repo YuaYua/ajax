@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+	</head>
+	<body>
+		<input type="text" name="" id="wd" value="" />
+		<ul id="uls">
+			
+		</ul>
+	</body>
+	<script type="text/javascript">
+		var wd=document.getElementById("wd");
+		wd.oninput=function(){
+			console.log(this.value);
+			var url="https://sp0.baidu.com/5a1Fazu8AA54nxGko9WTAnF6hhy/su?wd="+this.value+"&cb=success";
+			var os=document.createElement("script");
+			os.src=url;
+			var oh=document.getElementsByTagName("head")[0];
+			oh.appendChild(os);
+			oh.removeChild(os);
+		}
+		
+		var uls=document.getElementById("uls");
+		function success(data){
+			console.log(data);
+			uls.innerHTML="";
+			for(var i=0;i<data.s.length;i++){
+				var lis=document.createElement("li");
+				lis.innerHTML=data.s[i];
+				uls.appendChild(lis);
+			}
+			
+		}
+	</script>
+	<!--<script src="https://sp0.baidu.com/5a1Fazu8AA54nxGko9WTAnF6hhy/su?wd=a&cb=success" type="text/javascript">
+	</script>-->
+	
+</html>

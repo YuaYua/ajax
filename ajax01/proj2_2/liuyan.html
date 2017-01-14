@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+		<!--<link rel="stylesheet" type="text/css" href="../bootstrap.min.css" />-->
+		<style type="text/css">
+			body,
+			html {
+				margin: 0;
+				padding: 0;
+				background: #eee;
+				text-align: center;
+			}
+			
+			#bodys {
+				margin: auto;
+				text-align: left;
+				padding: 20px 10px;
+				width: 355px;
+				/*height: 600px;*/
+				border: 1px solid #aaa;
+			}
+			
+			#content {
+				width: 300px;
+				height: 150px;
+			}
+			
+			button {
+				display: block;
+				width: 90px;
+				height: 30px;
+				background: white;
+			}
+			
+			#center {
+				display: table;
+			}
+			
+			#ccc {
+				display: table-cell;
+				vertical-align: middle;
+			}
+			
+			ul {
+				list-style-type: none;
+				padding: 0;
+				margin: 10px 0 0px;
+			}
+			
+			li {
+				text-indent: 30px;
+				background: white;
+				list-style: none;
+				margin: 0;
+				padding: 0;
+				overflow: hidden;
+				padding-right: 10px;
+				border-bottom: 1px solid #ccc;
+			}
+			
+			.right {
+				text-align: right;
+			}
+			
+			.pagination {
+				margin: 10px 0 0;
+			}
+			
+			.pagination>li {
+				padding-right: 0;
+				text-indent: initial;
+			}
+			
+			#pages a {
+				margin-right: 10px;
+				background: orangered;
+			}
+		</style>
+
+	</head>
+
+	<body>
+		<input type="hidden" name="ids" id="ids" value="" />
+		<div id="bodys">
+			<div id="center">
+				<span id="ccc">内容：</span>
+				<textarea id="content" name="" rows="" cols=""></textarea>
+				<button id="sub" onclick="sub()">提交</button>
+			</div>
+			<div>
+				<input type="text" name="page" id="page" value="0" />
+			</div>
+			
+			<ul id="uls" data_id="ccc">
+
+			</ul>
+			<div id="pages">
+			</div>
+		</div>
+	</body>
+	<script src="../JQuery-3.1.1.min.js" type="text/javascript" charset="utf-8"></script>
+	<script type="text/javascript">
+		
+		//创建li
+		function createLi(data){
+			var times = data.mesTime * 1000;
+			var newDate = new Date();
+			newDate.setTime(times);
+			var dates = newDate.getFullYear() + '年' + ling(newDate.getMonth() + 1) + '月' + ling(newDate.getDate()) + '日' + ling(newDate.getHours()) + ':' + ling(newDate.getMinutes()) + ':' + ling(newDate.getSeconds());
+			var liObj = $("<li class='parents'><p>" +
+				data.mesCon +
+				"</p><p> <p class='right' data_id="+data.mesId+"><span>" +
+				dates +
+				"</span>顶：<a href='#' data_id='' onclick='' status='0'>" +
+				data.mesD +
+				"</a>踩：<a href='#' data_id='' onclick='' status='1'>" +
+				data.mesC +
+				"</a> <a href='#' data_id='' onclick='' status='2' >删除</a></p></p></li>");
+			return liObj;
+		}
+		
+		function selectAll(page){
+			$.ajax({
+				type: "get",
+				url: "all_db.php",
+				data: {
+					page: page
+				},
+				dataType: "json",
+				success: function(data) {
+					console.log("成功");
+					console.log(data);
+					for(var keys in data) {
+						if(keys != "page") {
+							var liObj = createLi(data[keys]);
+							$("#uls").append(liObj);
+						} 
+					}
+					setpages(data.page);
+				},
+				error: function(errors) {
+					console.log("失败");
+					console.log(errors);
+				},
+				async: true
+			});
+		}
+		selectAll(0);
+		
+		function setpages(page){
+			if(page==0){
+				$("#page").html("");
+			}else{
+				if($("#pages a").length<page){
+					for(var i = $("#pages a").length; i < page; i++) {
+						var pageA = $('<a class="pageA" pages=' + i + '>' + (i + 1) + '</a>');
+						$("#pages").append(pageA);
+					}
+				}else if($("#pages a").length>page){
+					var delA=$("#pages a").length-page;
+					for(var i=0;i<delA;i++){
+						$("#pages a:last-child").remove();
+					}
+				}
+				if($("#pages a").length==page){
+					if($("#uls li").length==0){
+						var indexpage=$("#page").val();
+						selectAll(indexpage-1);
+						$("#page").val(indexpage-1);
+					}
+				}
+			}			
+		}
+		
+		var pages = document.getElementById("pages");
+		pages.addEventListener("click", function(e) {
+			var ev = e || event;
+			console.log(ev.target);
+			var pages = $(ev.target).attr("pages");
+			if(pages) {
+				selectAll(pages);
+				$("#uls").html("");
+				$("#page").val(pages);
+			}
+		}, false);
+		
+		//提交添加留言
+		function sub() {
+			$.ajax({
+				type: "get",
+				url: "add.php",
+				data: {
+					content: $("#content").val(),
+				},
+				dataType: "json",
+				success: function(data) {
+					console.log("1");
+					console.log(data);
+					var liObj = createLi(data);
+					$("#uls").prepend(liObj);
+					var h = liObj.height();
+					liObj.height(0);
+					liObj.animate({
+						height: h
+					});
+					//当列表数大于6条时，去除最后一条
+					if($("#uls li").length == 6) {
+						$("#uls li:last-child").animate({
+							height: 0
+						}, function() {
+							$("#uls li:last-child").remove();
+						})
+					}
+					setpages(data.page);
+				},
+				error: function(errors) {
+					console.log("fail");
+					console.log(errors);
+				},
+				async: true
+			});
+		}
+		
+		var uls=document.getElementById("uls");
+		uls.addEventListener("click",function(e){
+			var ev=e||event;
+			var status=$(ev.target).attr("status");
+			if(status){
+				var liuyanId=$(ev.target).parent().attr("data_id");
+//				var li=$(ev.target).parents(".parents");
+				var indexs=$(ev.target).parents("li").index();
+				console.log(indexs);
+				switch(status){
+					case "0":
+						ding(liuyanId,ev.target);
+						break;
+					case "1":
+					
+						break;
+					case "2":
+						del(liuyanId,indexs);
+						break;
+					default:break;
+				}
+			}
+		},false);
+		
+		function ding(ids,obj){
+//			console.log(obj);
+			$.ajax({
+				type:"get",
+				url:"ding.php",
+				data:{
+					id:ids,
+				},
+				dataType:"json",
+				success:function(data){
+					console.log("成功");
+					console.log(data);
+					if(data.msg){
+						alert(data.msg);
+					}
+					if(data.errorcode==0){
+						$(obj).text(data.count);
+					}
+				},
+				error:function(errors){
+					console.log("失败");
+					console.log(errors);
+				},
+				async:true
+			});
+		}
+		
+		function del(ids,indexs){
+			$.ajax({
+				type:"get",
+				url:"del.php",
+				data:{
+					id:ids,
+					page:$("#page").val()
+				},
+				dataType:"json",
+				success:function(data){
+					$("#uls li").eq(indexs).animate({
+						height:0
+					},function(){
+						$("#uls li").eq(indexs).remove();
+						//判断li 还有吗
+						setpages(data.page);
+					});
+					if(data.errorcode==0){
+						var liObj = createLi(data[0]);
+						$("#uls").append(liObj);
+						var h = liObj.height();
+						liObj.height(0);
+						liObj.animate({
+							height: h
+						});
+					}
+				},
+				error:function(errors){
+					console.log("失败");
+					console.log(errors);
+				},
+				async:true
+			});
+		}
+		function ling(num) {
+			var str = "";
+			if(num < 10) {
+				str = "0" + num;
+				return str;
+			} else {
+				return num;
+			}
+		}
+	</script>
+</html>

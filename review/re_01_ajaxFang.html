@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+	</head>
+	<body>
+	</body>
+	<script src="../ajax01/JQuery-3.1.1.min.js" type="text/javascript" charset="utf-8"></script>
+	<script type="text/javascript">
+		
+		function path(data,type,url){
+			var arr=[];
+			for(var keys in data){
+				var str=keys+"="+data[keys];
+				arr.push(str);
+			}
+			var datas=arr.join("&");
+			if(type=="get"){
+				var urls=url+"?"+datas;
+				return urls;
+			}else if(type=="post"){
+				return datas;
+			}
+		}
+//		var result = path({
+//			name:"lck",
+//			pass:123
+//		},"post","index.php");
+//		console.log(result);
+		function ajax(obj){
+			//创建ajax 对象
+			var ajax=false;
+			if(window.XMLHttpRequest){
+				ajax=new XMLHttpRequest();
+			}else{
+				ajax=new ActiveXObject("Microsoft.XMLHTTP");
+			}
+			if(obj.type=="get"){
+				var url=path(obj.data,obj.type,obj.url);
+				ajax.open("get",url);
+				ajax.send();
+			}else if(obj.type=="post"){
+				var data=path(obj.data,obj.type,obj.url);
+				ajax.open("post",obj.url);
+				ajax.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+				ajax.send(data);
+			}
+			ajax.onreadystatechange=function(){
+//				console.log("hhh");
+				if (ajax.readyState==4) {
+					if(ajax.status==200){
+						obj.success(ajax.responseText);
+					}else{
+						obj.error();
+					}
+				}
+			}
+		}
+		ajax({
+			type:"get",
+			url:"re_02_ajax.php",
+			data:{
+				name:"ok"
+			},
+			success:function(data){
+				console.log("成功");
+				console.log(data);
+			},
+			error:function(errors){
+				console.log("失败");
+			},
+			async:true
+		});
+	</script>
+</html>

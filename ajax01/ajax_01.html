@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+		<style type="text/css">
+			#content {
+				width: 100px;
+				height: 100px;
+				background: orchid;
+			}
+		</style>
+	</head>
+
+	<body>
+		<div id="content">
+			<ul id="userUl">
+				
+			</ul>
+		</div>
+	</body>
+	<script src="JQuery-3.1.1.min.js" type="text/javascript" charset="utf-8"></script>
+	<script type="text/javascript">
+		var divs = document.getElementById("content");
+		var ul=document.getElementById("userUl");
+		divs.onclick = function() {
+			$.ajax({
+				type: "get",
+				url: "ajax_03.php",
+				//根据 type （get）传给php的data
+				data: {
+					name: "jinx",
+					id:2
+				},
+//				dataType:"json",//检测从 PHP 传回来的是不是json，是就进成功，否则进入 error,如果不设置dataType 不管 PHP 对错都会传给 success
+				//从 php 接收的 data
+				success: function(data) {
+//					console.log(typeof data);//string
+//					console.log(typeof JSON.parse(data));//object
+					var obj=JSON.parse(data);
+					for(var i=0;i<obj.length;i++){
+						var li=document.createElement("li");
+						li.innerHTML=obj[i].name;
+						ul.appendChild(li);
+					}
+					console.log(obj);
+					console.log("成功");
+//					console.log(data);
+//					divs.innerHTML = obj.name;
+				},
+				error: function(errors) {
+					console.log("失败");
+					console.log(errors);
+				},
+				async: true
+			});
+		}
+	</script>
+
+</html>
